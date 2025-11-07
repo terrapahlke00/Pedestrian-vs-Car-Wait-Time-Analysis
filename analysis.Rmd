@@ -1,1 +1,160 @@
-## Header
+---
+title: "Pedestrian vs Car Wait Time Analysis"
+author: "Terra Pahlke"
+output: html_document
+---
+
+# Libraries
+```{r, message = FALSE}
+library(tidyverse)
+library(gmodels)
+library(tidyverse)
+library(ggpubr)
+library("formattable")
+```
+
+
+# Load data
+```{r}
+load_data <- read.csv("dataset.csv")
+```
+
+## Data cleaning and transforming
+```{r}
+block1 <- factor(rep(c("Mon", "Tue", "Wed", "Thu", "Fri"), each = 3)) #day of week
+block2 <- factor(rep(c("Morning", "Afternoon", "Evening"), 5)) #time of day
+
+y <- c(rbind(load_data$y1, load_data$y2))
+                  
+data1 <- data.frame(day = rep(block1, each = 2), time = rep(block2, each = 2), 
+                    treatment = f, duration = y)
+```
+
+# Analysis
+
+## Exploratory Data Analysis
+```{r boxplot}
+#boxplot
+data1 %>% 
+  ggplot() +
+  aes(x = treatment, y = duration) +
+  labs(title = 'Treatment vs. Duration(sec)') +
+  geom_boxplot()
+```
+
+## Fit the model
+
+Model: $y_{ij}=\alpha+\beta_i+\tau_j+\gamma_k+(\beta\tau)_{ij}+(\beta\gamma)_{ik}+(\tau\gamma)_{jk}+\epsilon_{ijk}$
+
+```{r}
+# entire model
+mod1 <- aov(duration~.^3, data = data1)
+summary(mod1)
+# double interaction model
+mod1.1 <- aov(duration~.^2, data = data1)
+summary(mod1.1)
+# main effect model
+mod1.2 <- aov(duration~., data = data1)
+summary(mod1.2)
+```
+
+## Analysis of variance table
+```{r}
+mod1.3 <- lm(duration ~ ., data = data1)
+anova(mod1.3)
+```
+
+## Interaction plots
+```{r}
+# re-order data for interaction plot
+order_data <- data1 %>% 
+  mutate(
+    day = day %>% factor(levels=c("Mon", "Tue", "Wed", "Thu", "Fri")), #to keep in proper order
+    time = time %>% factor(levels = c("Morning", "Afternoon", "Evening")),
+    treatment = treatment)
+
+#day x time
+dt <- order_data %>% 
+  ggplot() +
+  aes(x = day, color = time, group = time, y = duration) +
+  stat_summary(fun = mean, geom = "point") +
+  labs(title = 'Interaction plot of Day and Time') +
+  stat_summary(fun = mean, geom = "line")
+
+#time x treatment
+ttr <- order_data %>% 
+  ggplot() +
+  aes(x = time, color = treatment, group = treatment, y = duration) +
+  stat_summary(fun = mean, geom = "point") +
+  labs(title = 'Interaction plot of Time and Treatment') +
+  stat_summary(fun = mean, geom = "line")
+
+#day x treatment
+dtr <- order_data %>% 
+  ggplot() +
+  aes(x = day, color = treatment, group = treatment, y = duration) +
+  stat_summary(fun = mean, geom = "point") +
+  labs(title = 'Interaction plot of Day and Treatment') +
+  stat_summary(fun = mean, geom = "line")
+
+ggarrange(dt, ttr, dtr + rremove("x.text"), 
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+```
+
+
+## 95% confidence intervals for all pairwise comparisons, and between treatment
+
+Interesting interactions:
+
+- Difference between times of day 
+
+$\gamma_1-\gamma_2$, $\gamma_1-\gamma_3$, $\gamma_2-\gamma_3$
+
+```{r}
+#only need to do TukeyHSD for a pairwise comparison
+tukey_time <- TukeyHSD(mod1.1, which = "time", conf.level = 0.95)
+plot(TukeyHSD(mod1.1, "time"), las = 3, cex.axis = 0.75)
+```
+
+```{r}
+con1 <- fit.contrast(mod1.3, "time", c(1/2, -1, 1/2), conf.int = 0.95) #between afternoon/morning - evening
+con1
+```
+
+- Difference between day of week 
+
+$\beta_1 - \beta_2$, $\beta_1-\beta_3$, $\beta_1-\beta_4$, $\beta_1-\beta_5$, $\beta_2-\beta_3$, $\beta_2-\beta_4$, $\beta_2-\beta_5$, $\beta_3-\beta_5$, $\beta_4-\beta_5$
+
+```{r}
+tukey_day <- TukeyHSD(mod1.1, which = "day", conf.level = 0.95)
+plot(TukeyHSD(mod1.1, "day"), las = 2, cex.axis = 0.75)
+```
+
+- Difference between treatments
+
+$\tau_1-\tau_2$
+
+```{r}
+TukeyHSD(mod1.1, which = "treatment", conf.level = 0.95)
+```
+
+## Further Analysis
+```{r pie_chart}
+ns_a <- 12
+ns <- 54
+ew <- 34
+total <- sum(ns_a, ns, ew)
+
+# pie chart of light times
+data2 <- data.frame(light = c("N/S advance", "N/S", "E/W"), time = c(12, 54, 34))
+
+data2 %>% 
+  ggplot() +
+  aes(x="", y = time, fill = light) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0)+
+  scale_fill_manual(values = c("#06ba15", "#a60a03", "#cf0a02"))+
+  geom_text(aes(y = time/3 + c(0, cumsum(time)[-length(time)]), 
+            label = percent(time/100, 0)), size=5)
+```
