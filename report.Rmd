@@ -32,10 +32,6 @@ For my project, I aimed to investigate whether there is an actual difference in 
 
 **Variable of interest**: Wait times at the Water and University Heights intersection in Peterborough, ON.
 
-![](Screen Shot 2022-11-25 at 11.02.52 AM.png)
-
-![](Screen Shot 2022-11-25 at 11.02.36 AM.png)
-
   *Measuring*: Using phone stopwatch. The time begins at either the push of the button or the stopping of the car over the pressure plate. The time ends when the light turns green (and walking is permitted)
 
 \clearpage
@@ -353,4 +349,5 @@ Overall, the city's claims support the study's findings that ultimately pedestri
 # Appendix
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
 ```
+
 
