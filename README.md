@@ -8,6 +8,6 @@ The goal of this study was to objectively analyze whether pedestrians truly face
 The analysis uses basic statistical methods to compare wait times for pedestrians and vehicles, and the findings aim to provide insights into how signal timings may be affecting pedestrian and vehicle flow at the intersection.
 
 ## Project Structure:
-- 'analysis.Rmd': The main R Markdown script preforming the analysis. THis script loads the dataset, conducts the statistical analysis (), and outputs the results
-- 'dataset.csv': The dataset used for analysis, containing recorded wait times for both pedestrians and vehicles at the intersection.
+- 'analysis.Rmd': The main R Markdown script preforming the analysis. This script loads the dataset, conducts the statistical analysis (), and outputs the results
+- 'dataset.csv': The dataset used for analysis, containing recorded wait times for both pedestrians (y1) and vehicles (y2) at the intersection.
 - project_report.pdf': A detailed project report that outlines the methodology, statistical analsysis, and conclusions drawn from the results of the study.
