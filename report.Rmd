@@ -2,29 +2,30 @@
 title: "Pedestrian vs Car Wait Time Analysis"
 author: "Terra Pahlke"
 date: "2022-11-02"
-output:
-  html_document:
-    toc: true
-    toc_depth: '2'
-    df_print: paged
+output: 
   pdf_document:
+    latex_engine: xelatex
     toc: true
     toc_depth: 2
     fig_caption: true
     extra_dependencies: subfig
+  html_document:
+    toc: true
+    toc_depth: '2'
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos='!h')
 ```
 
+\clearpage
+
 # Introduction
 
 As a university student who commutes daily, I frequently encounter the challenge of navigating busy intersections as both a pedestrian and a driver. Over time, I observed that, as a pedestrian, my wait times at traffic signals often seemed significantly longer compared to those of vehicles. This observation led me to question whether pedestrians truly experience longer delays, or if the perception of extended wait times was influenced by factors such as traffic patterns or signal timings.
 
 For my project, I aimed to investigate whether there is an actual difference in the duration of wait times for pedestrians versus vehicles at this intersection. Specifically, I sought to test whether pedestrians indeed experience longer delays when waiting for traffic signals to change, or if it is simply a subjective perception based on the time of day, traffic flow, or signal cycle.
-
-\clearpage
 
 # Overview
 
@@ -34,8 +35,6 @@ For my project, I aimed to investigate whether there is an actual difference in 
 
 
   *Measuring*: Using phone stopwatch. The time begins at either the push of the button or the stopping of the car over the pressure plate. The time ends when the light turns green (and walking is permitted)
-
-\clearpage
 
 - Treatment:
 
@@ -92,7 +91,6 @@ $\epsilon$ represents the experimental error
 
 Number of collected data points: 30
 
-\clearpage
 
 ## Sources of variability:
 
@@ -350,4 +348,3 @@ Overall, the city's claims support the study's findings that ultimately pedestri
 # Appendix
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
 ```
-
